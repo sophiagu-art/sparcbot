@@ -106,15 +106,52 @@ class WheelController:
         # using target_velocity_m_s, measured_velocity_m_s, self.config[LEFT] / self.config[RIGHT]
         # and the state set up in __init__. Use self.log(...) to record data.
 
-        # BEGIN SOLUTION
+        
+    # BEGIN SOLUTION
 
+    outputs = []
 
+    for SIDE in [LEFT, RIGHT]:
 
-        left_wheel_output = WheelControllerOutput(command=0.0) #TODO set command to your final controller output
+        # Target and measured wheel velocities
+        target = target_velocity_m_s[SIDE]
+        measured = measured_velocity_m_s[SIDE]
 
-        right_wheel_output = WheelControllerOutput(command=0.0) #TODO set command to your final controller output
-        return [left_wheel_output, right_wheel_output]
-        # END SOLUTION
+        # Calculate velocity error
+        error = target - measured
+
+        # Proportional control
+        P = self.config[SIDE].kp * error
+
+        # Integral control
+        self.error_integral[SIDE] += error * max(dt_s, 0.0)
+        I = self.config[SIDE].ki * self.error_integral[SIDE]
+
+        # Final PI command
+        u = P + I
+
+        # Limit command to allowed range
+        max_u = self.config[SIDE].max_command
+        u = max(-max_u, min(max_u, u))
+
+        # Reset integral and stop if target is zero
+        if abs(target) <= self.config[SIDE].zero_velocity_threshold:
+            self.error_integral[SIDE] = 0.0
+            u = 0.0
+
+        # Save state
+        self.previous_error[SIDE] = error
+        self.previous_command[SIDE] = u
+
+        outputs.append(WheelControllerOutput(command=u))
+
+    left_wheel_output = outputs[0]
+    right_wheel_output = outputs[1]
+
+    return [left_wheel_output, right_wheel_output]
+
+    # END SOLUTION
+
 
     def reset(self) -> None:
         """Clear the controller state (called when the robot stops or is reset)."""

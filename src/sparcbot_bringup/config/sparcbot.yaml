@@ -33,11 +33,11 @@ sparcbot_driver:
       pwm_chip: 0
       pwm_channel: 0
       pwm_frequency_hz: 20000
-      motor_sign: 1
+      motor_sign: -1
       encoder_sign: -1
 
     right_motor:
-      name: right
+      name: rightros2 run sparcbot_teleop pwm_teleop
       gpio_dir: 22
       gpio_ps: 25
       gpio_enc_a: 5
@@ -65,7 +65,7 @@ wheel_controller:
     log_file: ''
 
     left:
-      kp: 0.0
+      kp: 1.0
       ki: 0.0
       kd: 0.0
       feedforward:
@@ -80,7 +80,7 @@ wheel_controller:
         zero_velocity_threshold: 0.0005
 
     right:
-      kp: 0.0
+      kp: 1.0
       ki: 0.0
       kd: 0.0
       feedforward:
