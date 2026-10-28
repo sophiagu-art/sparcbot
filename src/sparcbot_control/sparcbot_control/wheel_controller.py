@@ -107,50 +107,50 @@ class WheelController:
         # and the state set up in __init__. Use self.log(...) to record data.
 
         
-    # BEGIN SOLUTION
+        # BEGIN SOLUTION
 
-    outputs = []
+        outputs = []
 
-    for SIDE in [LEFT, RIGHT]:
+        for SIDE in [LEFT, RIGHT]:
 
-        # Target and measured wheel velocities
-        target = target_velocity_m_s[SIDE]
-        measured = measured_velocity_m_s[SIDE]
+            # Target and measured wheel velocities
+            target = target_velocity_m_s[SIDE]
+            measured = measured_velocity_m_s[SIDE]
 
-        # Calculate velocity error
-        error = target - measured
+            # Calculate velocity error
+            error = target - measured
 
-        # Proportional control
-        P = self.config[SIDE].kp * error
+            # Proportional control
+            P = self.config[SIDE].kp * error
 
-        # Integral control
-        self.error_integral[SIDE] += error * max(dt_s, 0.0)
-        I = self.config[SIDE].ki * self.error_integral[SIDE]
+            # Integral control
+            self.error_integral[SIDE] += error * max(dt_s, 0.0)
+            I = self.config[SIDE].ki * self.error_integral[SIDE]
 
-        # Final PI command
-        u = P + I
+            # Final PI command
+            u = P + I
 
-        # Limit command to allowed range
-        max_u = self.config[SIDE].max_command
-        u = max(-max_u, min(max_u, u))
+            # Limit command to allowed range
+            max_u = self.config[SIDE].max_command
+            u = max(-max_u, min(max_u, u))
 
-        # Reset integral and stop if target is zero
-        if abs(target) <= self.config[SIDE].zero_velocity_threshold:
-            self.error_integral[SIDE] = 0.0
-            u = 0.0
+            # Reset integral and stop if target is zero
+            if abs(target) <= self.config[SIDE].zero_velocity_threshold:
+                self.error_integral[SIDE] = 0.0
+                u = 0.0
 
-        # Save state
-        self.previous_error[SIDE] = error
-        self.previous_command[SIDE] = u
+            # Save state
+            self.previous_error[SIDE] = error
+            self.previous_command[SIDE] = u
 
-        outputs.append(WheelControllerOutput(command=u))
+            outputs.append(WheelControllerOutput(command=u))
 
-    left_wheel_output = outputs[0]
-    right_wheel_output = outputs[1]
+        left_wheel_output = outputs[0]
+        right_wheel_output = outputs[1]
 
-    return [left_wheel_output, right_wheel_output]
+        return [left_wheel_output, right_wheel_output]
 
-    # END SOLUTION
+        # END SOLUTION
 
 
     def reset(self) -> None:
