@@ -20,7 +20,7 @@ sparcbot_driver:
 
     wheel_radius_m: 0.050
     counts_per_rev: 500.0       # encoder counts per gearbox output revolution
-    velocity_cutoff_hz: 8.0     # first-order low-pass on wheel velocity (<= 0 disables)
+    velocity_cutoff_hz: 5.0     # first-order low-pass on wheel velocity (<= 0 disables)
 
     # Wiring. Signs make "positive command" and "positive
     # encoder motion" both mean robot-forward wheel motion.
@@ -65,31 +65,31 @@ wheel_controller:
     log_file: ''
 
     left:
-      kp: 3.0
+      kp: 1.4
       ki: 0.5
       kd: 0.0
       feedforward:
-        forward_static: 0.0
-        forward_velocity_gain: 0.0
-        reverse_static: 0.0
-        reverse_velocity_gain: 0.0
-        forward_breakaway: 0.0
-        reverse_breakaway: 0.0
+        forward_static: 0.025
+        forward_velocity_gain: 0.7
+        reverse_static: 0.02
+        reverse_velocity_gain: 0.7
+        forward_breakaway: 0.1
+        reverse_breakaway: 0.1
         stopped_velocity_threshold: 0.025
         max_command: 1.0
         zero_velocity_threshold: 0.0005
 
     right:
-      kp: 3.0
-      ki: 0.5
+      kp: 1.1
+      ki: 0.3
       kd: 0.0
       feedforward:
-        forward_static: 0.0
-        forward_velocity_gain: 0.0
-        reverse_static: 0.0
-        reverse_velocity_gain: 0.0
-        forward_breakaway: 0.0
-        reverse_breakaway: 0.0
+        forward_static: 0.02
+        forward_velocity_gain: 0.7
+        reverse_static: 0.02
+        reverse_velocity_gain: 0.7
+        forward_breakaway: 0.1
+        reverse_breakaway: 0.1
         stopped_velocity_threshold: 0.025
         max_command: 1.0
         zero_velocity_threshold: 0.0005

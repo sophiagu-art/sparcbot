@@ -107,39 +107,58 @@ class WheelController:
         # and the state set up in __init__. Use self.log(...) to record data.
 
         
-        # BEGIN SOLUTION
+                # BEGIN SOLUTION
 
         outputs = []
 
         for SIDE in [LEFT, RIGHT]:
 
+            config = self.config[SIDE]
+
             # Target and measured wheel velocities
             target = target_velocity_m_s[SIDE]
             measured = measured_velocity_m_s[SIDE]
 
-            # Calculate velocity error
+            # Velocity error
             error = target - measured
 
             # Proportional control
-            P = self.config[SIDE].kp * error
+            P = config.kp * error
 
-            # Integral control
-            self.error_integral[SIDE] += error * max(dt_s, 0.0)
-            I = self.config[SIDE].ki * self.error_integral[SIDE]
+            # Feedforward control
+            if target > config.zero_velocity_threshold:
+                uff = config.forward_velocity_gain * target
+            elif target < -config.zero_velocity_threshold:
+                uff = config.reverse_velocity_gain * target
+            else:
+                uff = 0.0
 
-            # Final PI command
-            u = P + I
+            # Integral control with anti-windup
+            max_u = config.max_command
 
-            # Limit command to allowed range
-            max_u = self.config[SIDE].max_command
+            I = config.ki * self.error_integral[SIDE]
+            u = uff + P + I
+
+            # Conditional integration
+            if (u >= max_u and error > 0) or \
+               (u <= -max_u and error < 0):
+                pass
+            else:
+                self.error_integral[SIDE] += error * dt_s
+
+            # Recalculate final command
+            I = config.ki * self.error_integral[SIDE]
+            u = uff + P + I
+
+            # Saturate command
             u = max(-max_u, min(max_u, u))
 
-            # Reset integral and stop if target is zero
-            if abs(target) <= self.config[SIDE].zero_velocity_threshold:
+            # Stop when target velocity is zero
+            if abs(target) <= config.zero_velocity_threshold:
                 self.error_integral[SIDE] = 0.0
                 u = 0.0
 
-            # Save state
+            # Save controller state
             self.previous_error[SIDE] = error
             self.previous_command[SIDE] = u
 
